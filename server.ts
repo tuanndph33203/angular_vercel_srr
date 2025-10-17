@@ -61,7 +61,7 @@ export function app(): express.Express {
           <meta name="description" content="${data.titles.join(', ')}">
           <meta property="og:title" content="${data.name}">
           <meta property="og:description" content="${data.titles.join(', ')}">
-          <meta property="og:image" content="${data.url}">
+          <meta property="og:image" content="https://picsum.photos/200/300">
           <meta property="og:url" content="https://picsum.photos/200/300">
           <meta name="twitter:card" content="summary_large_image">
           </head>`
