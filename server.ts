@@ -20,13 +20,30 @@ export function app(): express.Express {
   // Example Express Rest API endpoints
   // server.get('/api/**', (req, res) => { });
   // Serve static files from /browser
-  server.get('*.*', express.static(browserDistFolder, {
-    maxAge: '1y'
-  }));
+  server.get(
+    '*.*',
+    express.static(browserDistFolder, {
+      maxAge: '1y',
+    })
+  );
 
   // All regular routes use the Angular engine
   server.get('*', (req, res, next) => {
     const { protocol, originalUrl, baseUrl, headers } = req;
+
+    const data = {
+      url: 'https://www.anapioficeandfire.com/api/characters/561',
+      name: 'Jeyne Westerling',
+      gender: 'Female',
+      culture: 'Westerman',
+      born: 'In 283 AC, at the Crag',
+      titles: ['Queen', 'Lady of Winterfell'],
+      books: [
+        'https://www.anapioficeandfire.com/api/books/3',
+        'https://www.anapioficeandfire.com/api/books/5',
+      ],
+      spouse: 'https://www.anapioficeandfire.com/api/characters/1880',
+    };
 
     commonEngine
       .render({
@@ -36,7 +53,22 @@ export function app(): express.Express {
         publicPath: browserDistFolder,
         providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
       })
-      .then((html) => res.send(html))
+      .then((html) => {
+        const injectedHtml = html.replace(
+          '</head>',
+          `
+          <title>${data.name}</title>
+          <meta name="description" content="${data.titles.join(', ')}">
+          <meta property="og:title" content="${data.name}">
+          <meta property="og:description" content="${data.titles.join(', ')}">
+          <meta property="og:image" content="${data.url}">
+          <meta property="og:url" content="https://picsum.photos/200/300">
+          <meta name="twitter:card" content="summary_large_image">
+          </head>`
+        );
+
+        res.send(injectedHtml);
+      })
       .catch((err) => next(err));
   });
 
